@@ -1,0 +1,63 @@
+<br><br><br>
+<section>
+    <div class="container pt-5">
+    <div class="row">
+      <div class="">
+          {{!-- <h1 class="m-auto">Cart Product</h1> --}}
+      </div>
+        <table class="table">
+  <thead>
+    <tr>
+      <th scope="col">ITEM</th>
+      <th scope="col">NAME</th>
+      <th scope="col">QUANTITY</th>
+      <th scope="col">REMOVE</th>
+    </tr>
+  </thead>
+  <tbody>
+    
+    {{#each products}}
+    <tr>
+      <th><img src="/product-images/{{this.product._id}}.jpg" style="width: 40px;height:40px;" alt=""></th>
+      <td>{{this.product.name}}</td>
+      <td><button class="cart-item-count  btn btn-sm btn-secondary mr-3 " onclick="changeQuantity('{{this._id}}','{{this.product._id}}',-1)">-</button><b id="quantity-count">{{this.quantity}}</b><button class="ml-3 cart-item-count btn btn-sm btn-secondary" onclick="changeQuantity('{{this._id}}','{{this.product._id}}',1)">+</button></td>
+      <td><button id=""  class="btn btn-danger btn-sm" onclick="removeCartProduct('{{this._id}}','{{this.product._id}}')">Remove</button></td>
+    </tr>
+        
+    {{/each}}
+  </tbody>
+</table>
+    </div>
+</div>
+</section>
+
+<script>
+    function removeCartProduct(cartId,proId){
+    $.ajax({
+        url:'/remove-cart-product',
+        data:{
+            cart:cartId,
+            product:proId
+        },
+        method:'post',
+        success:(response)=>{
+            alert(response)
+        }
+    })
+        }
+    function changeQuantity(cartId,proId,count){
+        $.ajax({
+            url:'/change-product-quantity',
+            data:{
+                cart:cartId,
+                product:proId,
+                count:count
+            },
+            method:'post',
+            success:(response)=>{
+                alert(response)
+            
+            }
+    })
+        }
+</script>
