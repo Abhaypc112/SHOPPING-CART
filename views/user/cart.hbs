@@ -1,63 +1,92 @@
 <br><br><br>
 <section>
     <div class="container pt-5">
-    <div class="row">
-      <div class="">
-          {{!-- <h1 class="m-auto">Cart Product</h1> --}}
-      </div>
-        <table class="table">
-  <thead>
-    <tr>
-      <th scope="col">ITEM</th>
-      <th scope="col">NAME</th>
-      <th scope="col">QUANTITY</th>
-      <th scope="col">REMOVE</th>
-    </tr>
-  </thead>
-  <tbody>
-    
-    {{#each products}}
-    <tr>
-      <th><img src="/product-images/{{this.product._id}}.jpg" style="width: 40px;height:40px;" alt=""></th>
-      <td>{{this.product.name}}</td>
-      <td><button class="cart-item-count  btn btn-sm btn-secondary mr-3 " onclick="changeQuantity('{{this._id}}','{{this.product._id}}',-1)">-</button><b id="quantity-count">{{this.quantity}}</b><button class="ml-3 cart-item-count btn btn-sm btn-secondary" onclick="changeQuantity('{{this._id}}','{{this.product._id}}',1)">+</button></td>
-      <td><button id=""  class="btn btn-danger btn-sm" onclick="removeCartProduct('{{this._id}}','{{this.product._id}}')">Remove</button></td>
-    </tr>
-        
-    {{/each}}
-  </tbody>
-</table>
+        <div class="row">
+            <div class="">
+                {{!-- <h1 class="m-auto">Cart Product</h1> --}}
+            </div>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">ITEM</th>
+                        <th scope="col">NAME</th>
+                        <th scope="col">PRICE</th>
+                        <th scope="col">QUANTITY</th>
+                        <th scope="col">REMOVE</th>
+                    </tr>
+                </thead>
+                <tbody>
+
+                    {{#each products}}
+                    <tr>
+                        <th><img src="/product-images/{{this.product._id}}.jpg" style="width: 40px;height:40px;" alt="">
+                        </th>
+                        <td>{{this.product.name}}</td>
+                        <td>{{this.product.price}}</td>
+                        <td><button class="cart-item-count  btn btn-sm btn-secondary mr-3 "
+                                onclick="changeQuantity('{{this._id}}','{{this.product._id}}','{{../user._id}}',-1)">-
+                            </button><span id="{{this.product._id}}">{{this.quantity}}</span>
+                                <button class="ml-3 cart-item-count btn btn-sm btn-secondary"
+                                    onclick="changeQuantity('{{this._id}}','{{this.product._id}}','{{../user._id}}',1)">+</button></td>
+                        <td><button id="" class="btn btn-danger btn-sm"
+                                onclick="removeCartProduct('{{this._id}}','{{this.product._id}}')">Remove</button></td>
+                    </tr>
+
+                    {{/each}}
+                </tbody>
+            </table>
+           
+        </div>
+         <hr>
+         <h5 class="float-right " style="margin-right: 8rem;" >RS <span id="total">{{total}}</span></h5><h5 class="float-right "style="margin-right: 9rem;">TOTAL : </h5>
+         <hr class="mt-5">
+         <a class="btn btn-success float-right"style="margin-right: 6rem;" href="/place-order">PLACE ORDER</a>
+         
     </div>
-</div>
 </section>
 
 <script>
     function removeCartProduct(cartId,proId){
-    $.ajax({
-        url:'/remove-cart-product',
-        data:{
-            cart:cartId,
-            product:proId
-        },
-        method:'post',
-        success:(response)=>{
-            alert(response)
-        }
-    })
-        }
-    function changeQuantity(cartId,proId,count){
         $.ajax({
-            url:'/change-product-quantity',
+            url:'/remove-cart-product',
             data:{
                 cart:cartId,
-                product:proId,
-                count:count
+                product:proId
             },
             method:'post',
             success:(response)=>{
-                alert(response)
-            
+                if(response.removeCartProduct){
+                    alert("Product remove from cart")
+                    location.reload()
+                }
             }
-    })
-        }
+        })
+    }
+
+    function changeQuantity(cartId, proId,userId, count) {
+        let quantity = parseInt(document.getElementById(proId).innerHTML)
+        count = parseInt(count)
+
+        $.ajax({
+            url: '/change-product-quantity',
+            data: {
+                user:userId,
+                cart: cartId,
+                product: proId,
+                count: count,
+                quantity:quantity
+            },
+            method: 'post',
+            success: (response) => {
+                if(response.removeProduct){
+                    alert("Product remove from cart")
+                    location.reload()
+                }else{
+                    document.getElementById(proId).innerHTML=quantity+count
+                    document.getElementById('total').innerHTML=response.total
+                }
+
+            }
+        })
+    }
 </script>
