@@ -19,7 +19,7 @@
                         <label for="price">Mobile</label>
                         <input type="number" class="form-control" id="mobile" name="mobile">
                     </div>
-                    <input type="text" id="userId" name="userId" value="{{user._id}}"hidden>
+                    <input type="text" id="userId" name="userId" value="{{user._id}}" hidden>
                 </div>
                 <div class="col">
                     <div class="card float-right border border-dark" style="width: 22rem; height:15rem;">
@@ -27,8 +27,7 @@
                         <hr>
                         <p class="pl-3">Payment method</p>
                         <div class="form-check form-check-inline pl-3">
-                            <input class="form-check-input" type="radio" name="payment-method" id=""
-                                value="COD">
+                            <input class="form-check-input" type="radio" name="payment-method" id="" value="COD">
                             <label class="form-check-label" for="inlineRadio1">COD</label>
                         </div>
                         <div class="form-check form-check-inline pl-3">
@@ -36,12 +35,10 @@
                                 value="Online payment">
                             <label class="form-check-label" for="inlineRadio2">Online payment</label>
                         </div>
-
-                        <button type="submit" style="width:8rem;" class="btn btn-primary btn-sm float-right mr-5 mt-2">Check out</button>
-
-
-                        <div class="card-body">
-
+                        <br>
+                        <div>
+                            <button type="submit" style="width:8rem;"
+                            class="btn btn-primary btn-sm float-right mr-5 mb-2">Check out</button>
                         </div>
                     </div>
                 </div>
@@ -51,7 +48,6 @@
     </div>
     </div>
 </section>
-
 <script>
     $("#checkout-form").submit((e) => {
         e.preventDefault()
@@ -61,11 +57,61 @@
             data: $('#checkout-form').serialize(),
             success: (response) => {
                 console.log(response)
-               if(response.status){
-                location.href='/order-done'
-               }
-                
+                if (response.codStatus) {
+                    location.href = '/order-done'
+                } else {
+                    razorpayPayment(response)
+                }
+
             }
         });
     });
+    function razorpayPayment(order) {
+        console.log(order)
+        var options = {
+            "key": "rzp_test_mtR164fMRyZwGM", // Enter the Key ID generated from the Dashboard
+            "amount": order.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+            "currency": "INR",
+            "name": "Abhay Pc", //your business name
+            "description": "Test Transaction",
+            "image": "https://example.com/your_logo",
+            "order_id": order.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+            "handler": function (response) {
+
+                verifyPayment(response,order)
+
+            },
+            "prefill": { //We recommend using the prefill parameter to auto-fill customer's contact information, especially their phone number
+                "name": "Gaurav Kumar", //your customer's name
+                "email": "gaurav.kumar@example.com",
+                "contact": "9000090000"  //Provide the customer's phone number for better conversion rates 
+            },
+            "notes": {
+                "address": "Razorpay Corporate Office"
+            },
+            "theme": {
+                "color": "#3399cc"
+            }
+        };
+        var rzp1 = new Razorpay(options);
+        rzp1.open();
+        
+    }
+    function verifyPayment(payment,order){
+        $.ajax({
+            url:'/verify-payment',
+            data:{
+                payment,
+                order
+            },
+            method:'post',
+            success:(response)=>{
+                if(response.status){
+                    location.href='/order-done'
+                }else{
+
+                }
+            }
+        })
+    }
 </script>
