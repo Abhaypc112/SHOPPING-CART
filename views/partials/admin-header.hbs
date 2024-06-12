@@ -1,5 +1,5 @@
 <header>
-        <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm fixed-to">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm fixed-top">
             <a class="navbar-brand" href="#">ADMIN-PANAL</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -11,13 +11,31 @@
                         <a class="nav-link" href="/admin/">All Products<span class="sr-only">(current)</span></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">All Orders</a>
+                        <a class="nav-link" href="/admin/orders">All Orders</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">All Users</a>
+                        <a class="nav-link" href="/admin/users">All Users</a>
                     </li>
                     
                 </ul>
+                 <div class="ml-auto">
+                <div class="dropdown">
+                <button class="btn btn-success btn-sm dropdown-toggle" type="button" data-toggle="dropdown"
+                    aria-expanded="false">
+                    {{#if admin}}
+                    Admin
+                    {{else}}
+                    Account
+                    {{/if}}
+                </button>
+                <div class="dropdown-menu"style="width: 3rem;">
+                    {{#if admin}}
+                    <a class="dropdown-item"  href="/admin/logout">Logout</a>
+                    {{else}}
+                    <a class="dropdown-item"  href="/admin/login">Login</a>
+                    {{/if}}
+                </div>
+            </div>
             </div>
         </nav>
     </header>

@@ -5,7 +5,7 @@ var userHelper=require('../helpers/user-helpers');
 const { response, render } = require('../app');
 const session = require('express-session');
 const verifyLogin=(req,res,next)=>{
-  if(req.session.loggedIn){
+  if(req.session.userLoggedIn){
     next()
   }else {
     res.redirect('/login')
@@ -27,11 +27,11 @@ router.get('/',async function(req, res, next) {
   
 });
 router.get('/login',(req,res)=>{
-  if(req.session.loggedIn){
+  if(req.session.user){
      res.redirect('/')
   }else{
-    res.render('user/login',{"loginErr":req.session.loginErr})
-    req.session.loginErr=false
+    res.render('user/login',{"loginErr":req.session.userLoginErr})
+    req.session.userLoginErr=false
 
   }
 })
@@ -40,8 +40,8 @@ router.get('/signup',(req,res)=>{
 })
 router.post('/signup',(req,res)=>{
   userHelper.doSignup(req.body).then((response)=>{
-    req.session.loggedIn=true
     req.session.user=response
+    req.session.userLoggedIn=true
     res.redirect('/')
 
   })
@@ -51,12 +51,12 @@ router.post('/login',(req,res)=>{
   userHelper.doLogin(req.body).then((response)=>{
     
     if(response.status){
-      req.session.loggedIn=true
       req.session.user=response.user
+      req.session.userLoggedIn=true
       req.session.cart=true
       res.redirect('/')
     }else{
-      req.session.loginErr='Invalid username or password'
+      req.session.userLoginErr='Invalid username or password'
       res.redirect('/login')
       
     }
@@ -66,15 +66,14 @@ router.post('/login',(req,res)=>{
 })
 
 router.get('/logout',(req,res)=>{
-  req.session.destroy()
+  req.session.user=null
+  req.session.userLoggedIn=false
   res.redirect('/')
 })
 router.get('/cart',verifyLogin,async(req,res)=>{
     let products=await userHelper.getCartProducts(req.session.user._id)
-    let total=await userHelper.getTotalAmount(req.session.user._id)
+      let total=await userHelper.getTotalAmount(req.session.user._id)
       res.render('user/cart',{products,user:req.session.user,total})
-      
-    
 })
 router.get('/add-to-cart/:id',(req,res)=>{
   console.log('Api Call')
